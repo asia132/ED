@@ -89,27 +89,21 @@ def create_tables():
             FOREIGN KEY (POSTATE) REFERENCES US_STATES(CODE));
         """)
     cur.execute("""
-        CREATE TABLE VENTORS(
-            VENTORID INT PRIMARY KEY,
+        CREATE TABLE AINVENTOR(
+            PATENT INT,
             LASTNAM VARCHAR(255),
             FIRSTNAM VARCHAR(255),
             MIDNAM VARCHAR(255),
             MODIFNAM VARCHAR(255),
             STREET VARCHAR(255),
             CITY VARCHAR(255),
-            POSTATE CHAR(2),
-            COUNTRY CHAR(2),
+            POSTATE VARCHAR(255),
+            COUNTRY VARCHAR(255),
             ZIP VARCHAR(255),
             INVSEQ INT,
+            FOREIGN KEY (PATENT) REFERENCES APAT(PATENT),
             FOREIGN KEY (COUNTRY) REFERENCES COUNTRIES(CODE),
             FOREIGN KEY (POSTATE) REFERENCES US_STATES(CODE));
-        """)
-    cur.execute("""
-        CREATE TABLE AINVENTOR(
-            PATENT INT,
-            VENTOR INT,
-            FOREIGN KEY (PATENT) REFERENCES APAT(PATENT),
-            FOREIGN KEY (VENTOR) REFERENCES VENTORS(VENTORID));
         """)
     cur.execute("""
         CREATE TABLE CITE75_99(
@@ -137,7 +131,6 @@ def drop_tables():
     cur.execute("""DROP TABLE CLASSES""")
     cur.execute("""DROP TABLE ACONAME""")
     cur.execute("""DROP TABLE APAT""")
-    cur.execute("""DROP TABLE VENTORS""")
     cur.execute("""DROP TABLE AINVENTOR""")
     cur.execute("""DROP TABLE CITE75_99""")
     cur.execute("""DROP TABLE CLASS_MATCH""")
@@ -218,21 +211,6 @@ def fill_subcategories(table="SUBCATEGORIES", start=1, end=-1):
                   "INSERT INTO " + table + " VALUES(" + line + ")")
 
 
-def fill_ventors(tableV="VENTORS", tableA="AINVENTOR", start=1, end=-1):
-    global cur
-    with open(sources[tableA]) as f:
-        lines = f.read().split('\n')[start:end]
-        ventor_id = 0
-        for line in lines:
-            patent_id = line[:7]
-            line = line[8:]
-            cur.execute(
-                "INSERT INTO " + tableV + " VALUES(" + str(ventor_id) + "," + line + ")")
-            cur.execute(
-                "INSERT INTO " + tableA + " VALUES(" + patent_id + "," + str(ventor_id) + ")")
-            ventor_id += 1
-
-
 if __name__ == "__main__":
     # utworzenie polaczenia z baza przechowywana na dysku
     con = sqlite3.connect('DATA_EXPLORATION.db')
@@ -241,6 +219,7 @@ if __name__ == "__main__":
     # utworzenie obiektu kursora
     cur = con.cursor()
 
+    # drop_tables()
     print "Table creation..."
     create_tables()
     print "Countries loading..."
@@ -258,7 +237,7 @@ if __name__ == "__main__":
     print "Apat loading..."
     fill_matches("APAT")
     print "Ainventor loading..."
-    fill_ventors()
+    fill_table("AINVENTOR")
     print "Cites loading..."
     fill_table("CITE75_99")
     print "Class matches loading..."
