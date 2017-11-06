@@ -11,7 +11,7 @@ sources = {
     "CLASSES": "./sources/classes.txt",
     "ACONAME": "./sources/aconame.txt",
     "APAT": "./sources/apat63_99.txt",
-    "AINVENTOR": "./sources/ainventor.txt",
+    "VENTORS": "./sources/ainventor.txt",
     "CITE75_99":  "./sources/cite75_99.txt",
     "CLASS_MATCH": "./sources/class_match.txt"
 }
@@ -31,94 +31,96 @@ def create_tables():
         """)
     cur.execute("""
         CREATE TABLE MATCHES(
-            ASSIGNEE INT,
-            ASSNAME VARCHAR(255),
-            CNAME VARCHAR(255),
-            CUSIP VARCHAR(255),
-            OWN INT,
-            PNAME VARCHAR(255),
-            SNAME VARCHAR(255));
+            ASSIGNEE numeric(12),
+            ASSNAME charachters(80),
+            OWN numeric(5),
+            PNAME   charachters(60),
+            SNAME   charachters(60),
+            CUSIP charachters(6),
+            CNAME charachters(36));
         """)
     cur.execute("""
         CREATE TABLE SUBCATEGORIES(
-            CAT INT,
-            SUBCAT INT PRIMARY KEY,
-            SUBCATNAME VARCHAR(255),
-            CATNAMESHORT VARCHAR(255),
-            CATNAMELONG VARCHAR(255));
+            CAT numeric(2),
+            SUBCAT numeric(2) PRIMARY KEY,
+            SUBCATNAME charachters(60),
+            CATNAMESHORT charachters(60),
+            CATNAMELONG charachters(60));
         """)
     cur.execute("""
         CREATE TABLE CLASSES(
-            CLASS INT PRIMARY KEY,
-            TITLE VARCHAR(255));
+            CLASS numeric(3) PRIMARY KEY,
+            TITLE charachters(255));
         """)
     cur.execute("""
         CREATE TABLE ACONAME(
-            ASSIGNEE INT,
-            COMPNAME VARCHAR(255),
+            ASSIGNEE numeric(12),
+            COMPNAME charachter(80),
             FOREIGN KEY (ASSIGNEE) REFERENCES MATCHES(ASSIGNEE));
         """)
     cur.execute("""
         CREATE TABLE APAT(
-            PATENT INT PRIMARY KEY,
-            GYEAR INT(4),
-            GDATE INT,
-            APPYEAR INT(4),
-            COUNTRY CHAR(2),
-            POSTATE CHAR(2),
-            ASSIGNEE INT,
-            ASSCODE INT,
-            CLAIMS INT,
-            NCLASS INT,
-            CAT INT,
-            SUBCAT INT,
-            CMADE INT,
-            CRECEIVE INT,
-            RATIOCIT INT,
-            GENERAL INT,
-            ORIGINAL INT,
-            FWDAPLAG INT,
-            BCKGTLAG INT,
-            SELFCTUB INT,
-            SELFCTLB INT,
-            SECDUPBD INT,
-            SECDLWBD INT,
+            PATENT      numeric(7) PRIMARY KEY,
+            GYEAR       numeric(12),
+            GDATE       numeric(12),
+            APPYEAR     numeric(12),
+            COUNTRY     numeric(3),
+            POSTATE     numeric(3),
+            ASSIGNEE    numeric(12),
+            ASSCODE     numeric(12),
+            CLAIMS      numeric(12),
+            NCLASS      numeric(12),
+            CAT         numeric(12),
+            SUBCAT      numeric(12),
+            CMADE       numeric(12),
+            CRECEIVE    numeric(12),
+            RATIOCIT    numeric(6),
+            GENERAL     numeric(6),
+            ORIGINAL    numeric(6),
+            FWDAPLAG    numeric(7),
+            BCKGTLAG    numeric(8),
+            SELFCTUB    numeric(6),
+            SELFCTLB    numeric(6),
+            SECDUPBD    numeric(6),
+            SECDLWBD    numeric(6),
             FOREIGN KEY (ASSIGNEE) REFERENCES MATCHES(ASSIGNEE),
             FOREIGN KEY (COUNTRY) REFERENCES COUNTRIES(CODE),
             FOREIGN KEY (SUBCAT) REFERENCES SUBCATEGORIES(SUBCAT),
+            FOREIGN KEY (CAT) REFERENCES SUBCATEGORIES(CAT)
             FOREIGN KEY (POSTATE) REFERENCES US_STATES(CODE));
         """)
     cur.execute("""
-        CREATE TABLE AINVENTOR(
-            PATENT INT,
-            LASTNAM VARCHAR(255),
-            FIRSTNAM VARCHAR(255),
-            MIDNAM VARCHAR(255),
-            MODIFNAM VARCHAR(255),
-            STREET VARCHAR(255),
-            CITY VARCHAR(255),
-            POSTATE VARCHAR(255),
-            COUNTRY VARCHAR(255),
-            ZIP VARCHAR(255),
-            INVSEQ INT,
+        CREATE TABLE VENTORS(
+            PATENT numeric(7),
+            LASTNAM charachters(20),
+            FIRSTNAM charachters(15),
+            MIDNAM charachters(9),
+            MODIFNAM charachters(3),
+            STREET charachters(30),
+            CITY charachters(20),
+            POSTATE charachters(2),
+            COUNTRY charachters(2),
+            ZIP charachters(5),
+            INVSEQ charachters(12),
             FOREIGN KEY (PATENT) REFERENCES APAT(PATENT),
             FOREIGN KEY (COUNTRY) REFERENCES COUNTRIES(CODE),
             FOREIGN KEY (POSTATE) REFERENCES US_STATES(CODE));
         """)
     cur.execute("""
         CREATE TABLE CITE75_99(
-            CITING INT,
-            CITED INT,
+            CITING numeric(7),
+            CITED numeric(7),
             FOREIGN KEY (CITING) REFERENCES APAT(PATENT),
             FOREIGN KEY (CITED) REFERENCES APAT(PATENT));
         """)
     cur.execute("""
         CREATE TABLE CLASS_MATCH(
-            CLASS INT,
-            SUBCAT INT,
-            CAT INT,
+            CLASS numeric(3),
+            SUBCAT numeric(2),
+            CAT numeric(2),
             FOREIGN KEY (SUBCAT) REFERENCES SUBCATEGORIES(SUBCAT),
-            FOREIGN KEY (CLASS) REFERENCES CLASSES(CLASS));
+            FOREIGN KEY (CLASS) REFERENCES CLASSES(CLASS),
+            FOREIGN KEY (CAT) REFERENCES SUBCATEGORIES(CAT));
         """)
 
 
@@ -237,7 +239,7 @@ if __name__ == "__main__":
     print "Apat loading..."
     fill_matches("APAT")
     print "Ainventor loading..."
-    fill_table("AINVENTOR")
+    fill_table("VENTORS")
     print "Cites loading..."
     fill_table("CITE75_99")
     print "Class matches loading..."
